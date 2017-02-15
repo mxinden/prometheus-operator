@@ -1,11 +1,11 @@
 REPO?=quay.io/coreos/prometheus-operator
-TAG?=$(shell git rev-parse --short HEAD)
+TAG?=latest
 NAMESPACE?=prometheus-operator-e2e-tests-$(shell LC_CTYPE=C tr -dc a-z0-9 < /dev/urandom | head -c 13 ; echo '')
 
 PROMU := $(GOPATH)/bin/promu
 PREFIX ?= $(shell pwd)
 
-CLUSTER_IP?=$(shell minikube ip)
+CLUSTER_IP?=API.$(shell kubectl config current-context)
 
 pkgs = $(shell go list ./... | grep -v /vendor/ | grep -v /test/)
 
