@@ -15,6 +15,9 @@
 package framework
 
 import (
+	"fmt"
+
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
@@ -24,7 +27,7 @@ import (
 func CreateClusterRole(kubeClient kubernetes.Interface, relativePath string) error {
 	clusterRole, err := parseClusterRoleYaml(relativePath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("parsing cluster role yaml %v failed", relativePath))
 	}
 
 	_, err = kubeClient.RbacV1beta1().ClusterRoles().Get(clusterRole.Name, metav1.GetOptions{})
@@ -33,14 +36,14 @@ func CreateClusterRole(kubeClient kubernetes.Interface, relativePath string) err
 		// ClusterRole already exists -> Update
 		_, err = kubeClient.RbacV1beta1().ClusterRoles().Update(clusterRole)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "updating cluster role failed")
 		}
 
 	} else {
 		// ClusterRole doesn't exists -> Create
 		_, err = kubeClient.RbacV1beta1().ClusterRoles().Create(clusterRole)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "creating cluster role failed")
 		}
 	}
 
