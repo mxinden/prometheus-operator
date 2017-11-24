@@ -30,6 +30,7 @@ import (
 	"github.com/coreos/prometheus-operator/pkg/prometheus"
 	operatorFramework "github.com/coreos/prometheus-operator/test/framework"
 	"github.com/pkg/errors"
+	"k8s.io/api/core/v1"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	crdc "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -37,7 +38,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/typed/extensions/v1beta1"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -97,17 +97,17 @@ func TestMigration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = k8sutil.WaitForCRDReady(mclientV1alpha1.Prometheuses(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(mclientV1alpha1.Prometheuses(v1.NamespaceAll).List)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = k8sutil.WaitForCRDReady(mclientV1alpha1.ServiceMonitors(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(mclientV1alpha1.ServiceMonitors(v1.NamespaceAll).List)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = k8sutil.WaitForCRDReady(mclientV1alpha1.Alertmanagers(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(mclientV1alpha1.Alertmanagers(v1.NamespaceAll).List)
 	if err != nil {
 		t.Fatal(err)
 	}

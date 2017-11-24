@@ -27,6 +27,8 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 
+	"k8s.io/api/core/v1"
+	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	extensionsobj "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -35,9 +37,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/v1"
-	extensionsv1beta1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 )
 
@@ -215,17 +214,17 @@ func (m *Migrator) migrateTPR2CRD() error {
 }
 
 func (m *Migrator) backupObjects() error {
-	err := m.backupObjectsInConfigMap(m.cmPrometheus, m.mclient.MonitoringV1alpha1().Prometheuses(api.NamespaceAll).List)
+	err := m.backupObjectsInConfigMap(m.cmPrometheus, m.mclient.MonitoringV1alpha1().Prometheuses(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "backing up Prometheus objects failed")
 	}
 
-	err = m.backupObjectsInConfigMap(m.cmServiceMonitor, m.mclient.MonitoringV1alpha1().ServiceMonitors(api.NamespaceAll).List)
+	err = m.backupObjectsInConfigMap(m.cmServiceMonitor, m.mclient.MonitoringV1alpha1().ServiceMonitors(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "backing up ServiceMonitor objects failed")
 	}
 
-	err = m.backupObjectsInConfigMap(m.cmAlertmanager, m.mclient.MonitoringV1alpha1().Alertmanagers(api.NamespaceAll).List)
+	err = m.backupObjectsInConfigMap(m.cmAlertmanager, m.mclient.MonitoringV1alpha1().Alertmanagers(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "backing up Alertmanager objects failed")
 	}
@@ -325,17 +324,17 @@ func (m *Migrator) backupObjectsInConfigMap(configmapName string, listFunc func(
 }
 
 func (m *Migrator) waitForCRDsReady() error {
-	err := k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().Prometheuses(api.NamespaceAll).List)
+	err := k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().Prometheuses(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for Prometheus CRD to be ready failed")
 	}
 
-	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().ServiceMonitors(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().ServiceMonitors(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for ServiceMonitor CRD to be ready failed")
 	}
 
-	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().Alertmanagers(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1().Alertmanagers(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for Alertmanager CRD to be ready failed")
 	}
@@ -618,17 +617,17 @@ func (m *Migrator) restoreAlertmanagersV1alpha1FromCM(configmapName string) erro
 }
 
 func (m *Migrator) waitForTPRsReady() error {
-	err := k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().Prometheuses(api.NamespaceAll).List)
+	err := k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().Prometheuses(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for Prometheus TPR to be ready failed")
 	}
 
-	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().ServiceMonitors(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().ServiceMonitors(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for ServiceMonitor TPR to be ready failed")
 	}
 
-	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().Alertmanagers(api.NamespaceAll).List)
+	err = k8sutil.WaitForCRDReady(m.mclient.MonitoringV1alpha1().Alertmanagers(metav1.NamespaceAll).List)
 	if err != nil {
 		return errors.Wrap(err, "waiting for Alertmanager TPR to be ready failed")
 	}
