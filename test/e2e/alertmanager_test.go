@@ -25,7 +25,6 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	testFramework "github.com/coreos/prometheus-operator/test/framework"
@@ -296,9 +295,7 @@ func TestAlertmanagerZeroDowntimeRollingDeployment(t *testing.T) {
 	}
 	err := testFramework.WaitForPodsReady(framework.KubeClient, ns, time.Minute*5, 1,
 		metav1.ListOptions{
-			LabelSelector: fields.SelectorFromSet(fields.Set(map[string]string{
-				"app": "alertmanager-webhook",
-			})).String(),
+			LabelSelector: "app=alertmanager-webhook",
 		},
 	)
 	if err != nil {
@@ -378,9 +375,7 @@ groups:
 	time.Sleep(1 * time.Minute)
 
 	opts := metav1.ListOptions{
-		LabelSelector: fields.SelectorFromSet(fields.Set(map[string]string{
-			"app": "alertmanager-webhook",
-		})).String(),
+		LabelSelector: "app=alertmanager-webhook",
 	}
 	pl, err := framework.KubeClient.Core().Pods(ns).List(opts)
 	if err != nil {

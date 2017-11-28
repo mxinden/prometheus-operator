@@ -22,7 +22,6 @@ import (
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -126,7 +125,7 @@ func (f *Framework) setupPrometheusOperator(opImage string) error {
 		return err
 	}
 
-	opts := metav1.ListOptions{LabelSelector: fields.SelectorFromSet(fields.Set(deploy.Spec.Template.ObjectMeta.Labels)).String()}
+	opts := metav1.ListOptions{LabelSelector: metav1.LabelSelector{MatchLabels: deploy.Spec.Template.ObjectMeta.Labels}.String()}
 	err = WaitForPodsReady(f.KubeClient, f.Namespace.Name, f.DefaultTimeout, 1, opts)
 	if err != nil {
 		return errors.Wrap(err, "failed to wait for prometheus operator to become ready")

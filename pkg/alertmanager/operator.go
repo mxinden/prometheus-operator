@@ -35,7 +35,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -414,11 +413,15 @@ func (c *Operator) sync(key string) error {
 }
 
 func ListOptions(name string) metav1.ListOptions {
-	return metav1.ListOptions{
-		LabelSelector: fields.SelectorFromSet(fields.Set(map[string]string{
+	labels := metav1.LabelSelector{
+		MatchLabels: map[string]string{
 			"app":          "alertmanager",
 			"alertmanager": name,
-		})).String(),
+		},
+	}
+
+	return metav1.ListOptions{
+		LabelSelector: labels.String(),
 	}
 }
 

@@ -65,26 +65,27 @@ func init() {
 }
 
 func Main() int {
-	logger := log.NewContext(log.NewLogfmtLogger(os.Stdout)).
-		With("ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+	logger = log.With(logger, "caller", log.DefaultCaller)
 
 	r := prometheus.NewRegistry()
 	r.MustRegister(prometheus.NewGoCollector())
 
-	po, err := prometheuscontroller.New(cfg, logger.With("component", "prometheusoperator"))
+	po, err := prometheuscontroller.New(cfg, log.With(logger, "component", "prometheusoperator"))
 	if err != nil {
 		fmt.Fprint(os.Stderr, "instantiating prometheus controller failed: ", err)
 		return 1
 	}
 
-	ao, err := alertmanager.New(cfg, logger.With("component", "alertmanageroperator"))
+	ao, err := alertmanager.New(cfg, log.With(logger, "component", "alertmanageroperator"))
 	if err != nil {
 		fmt.Fprint(os.Stderr, "instantiating alertmanager controller failed: ", err)
 		return 1
 	}
 
 	mux := http.NewServeMux()
-	web, err := api.New(cfg, logger.With("component", "api"))
+	web, err := api.New(cfg, log.With(logger, "component", "api"))
 	if err != nil {
 		fmt.Fprint(os.Stderr, "instantiating api failed: ", err)
 		return 1
